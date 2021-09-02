@@ -2,13 +2,14 @@ package ru.truebest;
 
 public class LzwDecoder extends LzwBase{
 
+    public static int DEFAULT_CODE_SIZE = 17;
     interface Callback{
-        void callingBack(byte buf[], int code);
+        void callingBack(byte[] buf, int code);
     }
 
     Callback f_write;
     Callback f_read;
-    private byte inbuff[];
+    private byte[] inbuff;
     private byte c;
 
     public void registerCallBacks(Callback f_read, Callback f_write){
@@ -20,9 +21,11 @@ public class LzwDecoder extends LzwBase{
         super();
     }
 
-    public void RestoreContext() {
-        code_size = 17;
-        en_dic = false;
+    public void ResetContext(int code_size) {
+        this.code = CODE_NULL;
+        this.code_size = code_size;
+        this.bit_n = 0;
+        this.en_dic = false;
     }
 
     private int LzwDecoderReadBits(int n_bits) {
@@ -35,7 +38,7 @@ public class LzwDecoder extends LzwBase{
         }
         bit_n -= n_bits;
         return (int) ((bit_buf >> bit_n) & ((1 << n_bits)-1));
-    };
+    }
 
     private int LzwDecoderGetStr(int code) {
         int i = LzwBase.TMP_BUF_SIZE;

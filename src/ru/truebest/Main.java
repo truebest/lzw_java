@@ -8,26 +8,11 @@ public class Main {
     static DataOutputStream out = null;
 
     public static void main(String[] args) {
-        int i = 0;
 
         LzwDecoder lzwDecoder = new LzwDecoder();
-        lzwDecoder.registerCallBacks(new LzwDecoder.Callback() {
-            @Override
-            public void callingBack(byte[] buf, int code) {
-
-            }
-        }, new LzwDecoder.Callback() {
-            @Override
-            public void callingBack(byte[] buf, int code) {
-                try {
-                    out.write(buf);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        lzwDecoder.registerCallBacks(Main::readData, Main::writeData);
         lzwDecoder.LzwLoadDictionary(args[1]);
-        lzwDecoder.RestoreContext();
+        lzwDecoder.ResetContext(LzwDecoder.DEFAULT_CODE_SIZE);
 
         try {
             in = new DataInputStream(new BufferedInputStream(
@@ -35,7 +20,7 @@ public class Main {
             out = new DataOutputStream(new BufferedOutputStream(
                     new FileOutputStream(args[2])));
 
-            byte tmp_array[];
+            byte[] tmp_array;
 
             do {
                 tmp_array = in.readNBytes(256);
@@ -43,8 +28,6 @@ public class Main {
             }while (tmp_array.length > 0);
 
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,4 +44,15 @@ public class Main {
         // write your code here
     }
 
+    private static void writeData(byte[] buf, int code) {
+        try {
+            out.write(buf);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void readData(byte[] buf, int code) {
+
+    }
 }
